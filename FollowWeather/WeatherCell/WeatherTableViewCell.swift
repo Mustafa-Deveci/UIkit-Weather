@@ -39,9 +39,7 @@ class WeatherTableViewCell: UITableViewCell {
         self.highTempLabel.text = "\(Int(temperatureMaxCelsius))°C"
         
         self.dayLabel.text = getDayforDate(Date(timeIntervalSince1970: Double(timezone)))
-        //self.iconImageView.image = UIImage(named: "Rainy")
         self.iconImageView.contentMode = .scaleAspectFit
-        print(model.temp)
         
         let temp = model.temp - 273.15
         

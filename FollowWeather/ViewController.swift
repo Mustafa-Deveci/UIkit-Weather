@@ -12,6 +12,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBOutlet var tableView : UITableView!
     var models = [WeatherData.Main]()
+    var weatherInf = [WeatherData.Weather]()
     
     let locationManager = CLLocationManager()
     var currentLocation: CLLocation?
@@ -21,7 +22,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.register(HourlyTableViewCell.nib(), forCellReuseIdentifier: HourlyTableViewCell.identifier)
+        tableView.register(WeatherInfTableViewCell.nib(), forCellReuseIdentifier: WeatherInfTableViewCell.identifier)
         tableView.register(WeatherTableViewCell.nib(), forCellReuseIdentifier: WeatherTableViewCell.identifier)
         
         tableView.dataSource = self
@@ -83,9 +84,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let entries = result.main
             self.models.insert(contentsOf: [entries] , at: 0)
             let current = result.main
-            let sys = result.sys
             self.current = current
+            let sys = result.sys
             self.sys = sys
+            self.weatherInf = result.weather
+            
             DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.tableView.tableHeaderView = self.createTableHeader()
@@ -132,19 +135,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
-    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return models.count
-    }
+            if section == 0 {
+                // collectiontableviewcell
+                return 1
+            }
+            return models.count
+        }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherTableViewCell.identifier, for: indexPath) as! WeatherTableViewCell
-        cell.configure(with: models[indexPath.row])
-        cell.backgroundColor = UIColor(red: 52/255.0, green: 109/255.0, blue: 179/255.0, alpha: 1.0)
-        return cell
-        
-    }
+            if indexPath.section == 0 {
+                let cell = tableView.dequeueReusableCell(withIdentifier: WeatherInfTableViewCell.identifier, for: indexPath) as! WeatherInfTableViewCell
+                cell.configure(with: weatherInf)
+                cell.backgroundColor = UIColor(red: 52/255.0, green: 109/255.0, blue: 179/255.0, alpha: 1.0)
+                return cell
+            }
+
+            let cell = tableView.dequeueReusableCell(withIdentifier: WeatherTableViewCell.identifier, for: indexPath) as! WeatherTableViewCell
+            cell.configure(with: models[indexPath.row])
+            cell.backgroundColor = UIColor(red: 52/255.0, green: 109/255.0, blue: 179/255.0, alpha: 1.0)
+            return cell
+        }
+
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
